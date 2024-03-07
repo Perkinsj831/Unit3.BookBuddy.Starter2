@@ -15,7 +15,7 @@ function App() {
       <Navigations />
       <Routes>
         <Route path='/' element={<div>Hello</div>} />
-        <Route path='/books' element={<Books />} />
+        <Route path='/books' element={<Books token={token} />} />
         <Route path='/register' element={<Register setToken={setToken} />} />
         <Route path='/login' element={<Login setToken={setToken} />} />
         <Route path='/account' element={<Account token={token} />} />

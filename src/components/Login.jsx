@@ -25,7 +25,7 @@ export default function Login({ setToken }) {
       const { data } = await axios.post('https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api/users/login', body)
 
       setToken(data.token)
-      navigate('/')
+      navigate('/account')
     } catch (error) {
       setError(error.message)
     }

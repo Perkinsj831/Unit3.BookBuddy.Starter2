@@ -5,25 +5,48 @@ import { useState, useEffect } from "react"
 
 export default function Account({ token }) {
   const [account, setAccount] = useState(null)
+  const [reservations, setReservations] = useState([])
 
   useEffect(() => {
     async function loadAccount() {
       try {
-        const { data } = await axios.get('https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api/users/me', {
+        const accountReponse = await axios.get('https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api/users/me', {
           headers: {
             Authorization: 'Bearer ' + token
           }
         })
-        setAccount(data)
+        // accountResponse looks like { data: actual data }
+        setAccount(accountReponse.data) // instead of `const { data } =`
+
+        const reservationsResponse = await axios.get('https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api/reservations', {
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
+        })
+        // reservationsResponse looks like { data: actual data }
+        console.log('reservationsResponse', reservationsResponse)
+        setReservations(reservationsResponse.data.reservation)
       } catch (e) {
         console.error(e)
       }
     }
     loadAccount()
-  })
+  }, [token])
 
   if (!account) {
     return <div>Not logged in</div>
+  }
+
+  async function returnBook(reservationId) {
+    try {
+      const { data } = await axios.delete(`https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api/reservations/${reservationId}`, {
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      })
+    } catch(e) {
+      console.error(e)
+    }
   }
 
   return <main>
@@ -32,9 +55,12 @@ export default function Account({ token }) {
     <div>Checked out books:
       <div>
         {
-          account.books.map(book => {
+          reservations.map(reservation => {
             return (
-              <h2 key={book.id}>{book.title}</h2>
+              <article key={reservation.id}>
+                <h2>{reservation.title}</h2>
+                <button onClick={() => returnBook(reservation.id)}>Return</button>
+              </article>
             )
           })
         }

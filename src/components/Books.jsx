@@ -2,7 +2,7 @@
 import axios from "axios"
 import { useState, useEffect } from "react"
 
-export default function Books() {
+export default function Books({ token }) {
   const [books, setBooks] = useState([])
 
   useEffect(() => {
@@ -17,12 +17,29 @@ export default function Books() {
     loadBooks()
   }, [])
 
+  async function checkOut(bookId) {
+    const body = {
+      available: false
+    }
+
+    try {
+      const { data } = await axios.patch(`https://fsa-book-buddy-b6e748d1380d.herokuapp.com/api/books/${bookId}`, body, {
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      })
+    } catch(e) {
+      console.error(e)
+    }
+  }
+
   return <main>
     {
       books.map(book => {
-        return (
-          <h2 key={book.id}>{book.title}</h2>
-        )
+        return <article key={book.id}>
+          <h2>{book.title}</h2>
+          <button onClick={() => checkOut(book.id)}>Check out</button>
+        </article>
       })
     }
   </main>
